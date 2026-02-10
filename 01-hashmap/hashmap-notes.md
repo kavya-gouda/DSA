@@ -388,3 +388,88 @@ Use this file as a quick reference:
 - For problem patterns, revisit **Section 8**.
 - For conceptual depth, refer to **Sections 7, 9–11**.
 
+---
+
+## 14. Python: Custom HashMap & Built-in `dict`
+
+### 14.1 Built-in Usage
+
+In Python, use **`dict`** for hashmaps. It's highly optimized and supports:
+
+```python
+d = {}
+d["a"] = 1
+d["b"] = 2
+print(d["a"])           # 1
+print(d.get("c", -1))   # -1 (default if missing)
+print("a" in d)         # True
+del d["b"]
+for k, v in d.items():
+    print(k, v)
+```
+
+- **Keys**: must be **hashable** (immutable: `int`, `str`, `tuple`, etc.). Lists and dicts cannot be keys.
+- **`collections.defaultdict`**: dict that auto-creates default values for missing keys (e.g. `defaultdict(int)` for frequency counts).
+
+### 14.2 Custom Implementation (Learning)
+
+See **`hashmap.py`** in the repo root for a minimal HashMap with:
+
+- Separate chaining (list of `_Entry` nodes per bucket).
+- `put`, `get`, `remove`, `__contains__`, `__getitem__`, `__setitem__`.
+- Resize when load factor ≥ 0.75.
+
+Run it:
+
+```bash
+python hashmap.py
+```
+
+### 14.3 Python Idioms for HashMap Problems
+
+| Pattern | Idiom |
+|--------|--------|
+| Frequency count | `from collections import Counter` or `defaultdict(int)` |
+| First/last index | `dict[key] = index` (overwrite for last) |
+| Presence check | `key in d` or `d.get(key) is not None` (if None not stored) |
+| Default value | `d.get(key, default)` or `defaultdict(lambda: value)` |
+
+---
+
+## 15. Practice Problems (Easy → Hard)
+
+Use **hashmap / dict** (and sometimes **set**) for these. Order: easy → medium → hard.
+
+### Easy
+
+| # | Problem | Idea |
+|---|--------|------|
+| 1 | **Two Sum** – indices where `nums[i] + nums[j] = target` | Map `value → index`; for each `x` check `target - x` in map. |
+| 2 | **First Unique Character** – first non-repeating char in string | Frequency map; then scan string for first char with count 1. |
+| 3 | **Valid Anagram** – are two strings anagrams? | Count chars in first string; decrement with second; all counts 0. |
+| 4 | **Contains Duplicate** – any duplicate in array? | Use a set (or dict) of seen values. |
+| 5 | **Intersection of Two Arrays** | Set of one array; collect from other if in set. |
+
+### Medium
+
+| # | Problem | Idea |
+|---|--------|------|
+| 6 | **Group Anagrams** – group strings that are anagrams | Key = sorted string (or tuple of counts); value = list of strings. |
+| 7 | **Subarray Sum Equals K** – count subarrays with sum = k | Prefix sum + map: `prefix_count[sum - k]`; maintain `prefix_count`. |
+| 8 | **Longest Substring Without Repeating Characters** | Sliding window + map: `char → last index`; move `left` on repeat. |
+| 9 | **Longest Consecutive Sequence** – longest consecutive integers in unsorted array | Put all in set; for each `x`, if `x-1` not in set, extend streak from `x`. |
+| 10 | **Top K Frequent Elements** | Frequency map; then bucket by frequency or heap (or quickselect). |
+
+### Hard
+
+| # | Problem | Idea |
+|---|--------|------|
+| 11 | **Substring with Concatenation of All Words** | Sliding window; map word → count; match window counts. |
+| 12 | **Minimum Window Substring** – smallest window containing all chars of target | Two pointers + two maps (need vs have); shrink when valid. |
+| 13 | **LFU Cache** | HashMap + frequency structure (e.g. dict of doubly linked lists per frequency). |
+
+### Where to Find Them
+
+- **LeetCode**: Search by problem name (e.g. "Two Sum", "Group Anagrams").
+- **Practice order**: Do Easy 1–5, then Medium 6–10; use **Section 8** for pattern hints.
+
