@@ -5,6 +5,8 @@ See two-pointer-notes.md for full documentation.
 
 from __future__ import annotations
 
+from typing import Optional
+
 
 # ---------------------------------------------------------------------------
 # Beginner: Opposite-direction (converging)
@@ -135,6 +137,68 @@ def at_most_k_distinct(arr: list[int], k: int) -> int:
             left += 1
         result += right - left + 1
     return result
+
+
+# ---------------------------------------------------------------------------
+# Advanced: Slow and fast pointer (linked list)
+# ---------------------------------------------------------------------------
+
+
+class ListNode:
+    """Simple linked list node."""
+
+    def __init__(self, val: int = 0, next: Optional[ListNode] = None):
+        self.val = val
+        self.next = next
+
+
+def has_cycle(head: Optional[ListNode]) -> bool:
+    """Cycle detection. If fast meets slow, cycle exists."""
+    slow = fast = head
+    while fast and fast.next:
+        slow = slow.next  # type: ignore
+        fast = fast.next.next  # type: ignore
+        if slow == fast:
+            return True
+    return False
+
+
+def find_middle(head: Optional[ListNode]) -> Optional[ListNode]:
+    """Return middle node. When fast reaches end, slow is at middle."""
+    slow = fast = head
+    while fast and fast.next:
+        slow = slow.next  # type: ignore
+        fast = fast.next.next  # type: ignore
+    return slow
+
+
+def detect_cycle_start(head: Optional[ListNode]) -> Optional[ListNode]:
+    """Return node where cycle starts, or None if no cycle."""
+    slow = fast = head
+    while fast and fast.next:
+        slow = slow.next  # type: ignore
+        fast = fast.next.next  # type: ignore
+        if slow == fast:
+            p = head
+            while p != slow:
+                p = p.next  # type: ignore
+                slow = slow.next  # type: ignore
+            return p
+    return None
+
+
+def nth_from_end(head: Optional[ListNode], n: int) -> Optional[ListNode]:
+    """Return nth node from end (1-based), or None if not enough nodes."""
+    fast = head
+    for _ in range(n):
+        if not fast:
+            return None
+        fast = fast.next
+    slow = head
+    while fast:
+        slow = slow.next  # type: ignore
+        fast = fast.next  # type: ignore
+    return slow
 
 
 # ---------------------------------------------------------------------------

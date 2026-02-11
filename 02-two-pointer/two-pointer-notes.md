@@ -204,11 +204,118 @@ def trap(height: list[int]) -> int:
     return water
 ```
 
-#### 6.2 Linked List: Slow and Fast Pointer
+#### 6.2 Linked List: Slow and Fast Pointer (Tortoise and Hare)
 
-- **Cycle detection**: If there is a cycle, fast will eventually meet slow.
-- **Middle of list**: When fast reaches the end, slow is at the middle.
-- **Nth node from end**: Move fast `n` steps ahead, then move both until fast is None; slow is at nth from end.
+Also called **Floyd's cycle detection** or **tortoise and hare**. Both pointers start at the head:
+- **Slow**: moves 1 step per iteration
+- **Fast**: moves 2 steps per iteration
+
+**Why it works**: The fast pointer catches up to the slow one inside a cycle because the gap between them decreases by 1 each step. In one pass you get **O(n)** time and **O(1)** space.
+
+---
+
+**1. Cycle detection**
+
+Does the list have a cycle?
+
+- **No cycle**: fast reaches the end (`None`) and we stop.
+- **Cycle**: fast eventually meets slow inside the cycle.
+
+```text
+Start:  S F
+        ↓ ↓
+        1 → 2 → 3 → 4
+              ↑_____↓
+
+Step 1:   S   F
+Step 2:       S     F
+Step 3:           S F   ← meet!
+```
+
+```python
+def has_cycle(head) -> bool:
+    slow = fast = head
+    while fast and fast.next:
+        slow = slow.next
+        fast = fast.next.next
+        if slow == fast:
+            return True
+    return False
+```
+
+---
+
+**2. Finding the middle**
+
+When `fast` reaches the end, `slow` is at the middle (or second middle if length is even). Fast moves 2x, so when fast has traveled n nodes, slow has traveled n/2.
+
+```python
+def find_middle(head):
+    slow = fast = head
+    while fast and fast.next:
+        slow = slow.next
+        fast = fast.next.next
+    return slow
+```
+
+---
+
+**3. Finding the start of a cycle**
+
+After slow and fast meet inside the cycle:
+1. Put one pointer at the **head**, keep the other at the **meeting point**.
+2. Move both **one step at a time**.
+3. They meet at the cycle start.
+
+**Why**: Let `a` = distance head → cycle start, `b` = cycle start → meeting point, `c` = rest of cycle. When they meet: slow has gone `a + b`, fast has gone `2(a + b)`. So `a + b` equals the cycle length (mod cycle), and `a ≡ c`. So a pointer at head and one at meeting, both moving 1 step, meet after `a` steps at the cycle start.
+
+```python
+def detect_cycle_start(head):
+    slow = fast = head
+    while fast and fast.next:
+        slow = slow.next
+        fast = fast.next.next
+        if slow == fast:
+            p = head
+            while p != slow:
+                p = p.next
+                slow = slow.next
+            return p
+    return None
+```
+
+---
+
+**4. Nth node from the end**
+
+- Move `fast` **n steps** ahead.
+- Move both one step at a time until `fast` is at the end.
+- `slow` is at the nth node from the end.
+
+```python
+def nth_from_end(head, n):
+    fast = head
+    for _ in range(n):
+        if not fast:
+            return None
+        fast = fast.next
+    slow = head
+    while fast:
+        slow = slow.next
+        fast = fast.next
+    return slow
+```
+
+---
+
+**Slow/fast summary**
+
+| Problem        | Slow step | Fast step | Extra logic                                |
+|----------------|-----------|-----------|--------------------------------------------|
+| Cycle detection| 1         | 2         | `slow == fast` ⇒ cycle exists              |
+| Middle         | 1         | 2         | Stop when fast reaches end                 |
+| Cycle start    | 1         | 2         | Then reset one to head, both move 1        |
+| Nth from end   | 1         | 1 (lead n)| Fast leads by n, then both move 1 together |
 
 #### 6.3 Dutch National Flag (Partition)
 
